@@ -120,3 +120,32 @@ function readInt16LE(bytes) {
     var ref = readUInt16LE(bytes);
     return ref > 0x7fff ? ref - 0x10000 : ref;
 }
+
+function bcd2ToDecimal(value) {
+    var result = value & 0xF;
+    if (result > 9 || value >= 0xA0) {
+        return 0;
+    } 
+    return result + 10 * (value >> 4);
+}
+
+function bcd22ToVersion(value) {
+    var result = bcd2ToDecimal(value >> 8) + (bcd2ToDecimal(value & 0xFF) / 100);
+    return result;
+}
+
+function readVersion(bytes) {
+    return bcd22ToVersion(readUInt16BE(bytes));
+}
+
+function encodeHex(byte) {
+    return ("0" + byte.toString(16)).substr(-2);
+}
+
+function readHexBytes(bytes) {
+    var result = "";
+    for (var i = 0; i < bytes.length; ++i) {
+        result = result + "-" + encodeHex(bytes[i]);
+    }
+    return result.substr(1);
+}
