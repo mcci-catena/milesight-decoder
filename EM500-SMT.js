@@ -45,7 +45,7 @@ function Decoder(bytes, port) {
         var channel_type = bytes[i++];
         // BATTERY
         if (channel_id === 0x01 && channel_type === 0x75) {
-            decoded.battery = bytes[i]; 
+            decoded.battery = bytes[i];
             i += 1;
         }
         // TEMPERATURE
@@ -57,7 +57,7 @@ function Decoder(bytes, port) {
         else if (channel_id === 0x04 && channel_type === 0x68) {
             decoded.humidity = bytes[i] / 2;
             i += 1;
-        } 
+        }
         // Electrical Conductivity
         else if (channel_id === 0x05 && channel_type === 0x7f) {
             decoded.conductivity= readInt16LE(bytes.slice(i, i + 2)) ;
@@ -125,7 +125,7 @@ function bcd2ToDecimal(value) {
     var result = value & 0xF;
     if (result > 9 || value >= 0xA0) {
         return 0;
-    } 
+    }
     return result + 10 * (value >> 4);
 }
 

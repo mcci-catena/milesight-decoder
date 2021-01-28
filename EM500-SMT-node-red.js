@@ -21,16 +21,16 @@ function dewpoint(t, rh) {
 	    h = 0.01;
 	else if (h > 1.0)
 	    h = 1.0;
-    
+
 	var lnh = Math.log(h);
 	var tpc1 = t + c1;
 	var txc2 = t * c2;
 	var txc2_tpc1 = txc2 / tpc1;
-    
+
 	var tdew = c1 * (lnh + txc2_tpc1) / (c2 - lnh - txc2_tpc1);
 	return tdew;
     }
-    
+
 /*
 
 Name:   EM500-SMT.js
@@ -78,7 +78,7 @@ function Decoder(bytes, port) {
         var channel_type = bytes[i++];
         // BATTERY
         if (channel_id === 0x01 && channel_type === 0x75) {
-            decoded.battery = bytes[i]; 
+            decoded.battery = bytes[i];
             i += 1;
         }
         // TEMPERATURE
@@ -90,7 +90,7 @@ function Decoder(bytes, port) {
         else if (channel_id === 0x04 && channel_type === 0x68) {
             decoded.humidity = bytes[i] / 2;
             i += 1;
-        } 
+        }
         // Electrical Conductivity
         else if (channel_id === 0x05 && channel_type === 0x7f) {
             decoded.conductivity= readInt16LE(bytes.slice(i, i + 2)) ;
@@ -158,7 +158,7 @@ function bcd2ToDecimal(value) {
     var result = value & 0xF;
     if (result > 9 || value >= 0xA0) {
         return 0;
-    } 
+    }
     return result + 10 * (value >> 4);
 }
 

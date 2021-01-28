@@ -37,10 +37,10 @@
 //example Decode function :
 function Decode(fPort, bytes) {
   var decoder = {};
-  if (fPort == 85) {  
+  if (fPort == 85) {
   	decoder.sensorsId = LoRaObject.devEUI
   	decoder.flag = "A"
-  	decoder.addTime = LoRaObject.time    
+  	decoder.addTime = LoRaObject.time
   	decoder.value = bytes[0];
   }
 

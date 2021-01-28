@@ -148,7 +148,7 @@ Author:
  * 01: battery      -> 0x01 0x75 [1byte]  Unit: %
  * 03: temperature  -> 0x03 0x67 [2bytes] Unit: °C
  * 04: humidity     -> 0x04 0x68 [1byte]  Unit: %
- * 05: PIR          -> 0x05 0x6A [2bytes] 
+ * 05: PIR          -> 0x05 0x6A [2bytes]
  * 06: illumination -> 0x06 0x65 [6bytes] Unit: lux
  * ------------------------------------------ AM100
  * 07: CO2          -> 0x07 0x7D [2bytes] Unit: ppm
@@ -247,13 +247,13 @@ function Decoder(bytes, port) {
                 var enabledSensors = readUInt16BE(bytes.slice(i, i+2));
                 i += 2;
                 decoded.EnabledSensors = {
-                    temperature : (enabledSensors & 0x01) !== 0, 
-                    humidity    : (enabledSensors & 0x02) !== 0, 
-                    activity    : (enabledSensors & 0x04) !== 0, 
-                    illumination: (enabledSensors & 0x08) !== 0, 
-                    co2         : (enabledSensors & 0x10) !== 0, 
-                    tvoc        : (enabledSensors & 0x20) !== 0, 
-                    pressure    : (enabledSensors & 0x40) !== 0, 
+                    temperature : (enabledSensors & 0x01) !== 0,
+                    humidity    : (enabledSensors & 0x02) !== 0,
+                    activity    : (enabledSensors & 0x04) !== 0,
+                    illumination: (enabledSensors & 0x08) !== 0,
+                    co2         : (enabledSensors & 0x10) !== 0,
+                    tvoc        : (enabledSensors & 0x20) !== 0,
+                    pressure    : (enabledSensors & 0x40) !== 0,
                     };
             } else {
                 decoded.Error = true;
@@ -289,7 +289,7 @@ function bcd2ToDecimal(value) {
     var result = value & 0xF;
     if (result > 9 || value >= 0xA0) {
         return 0;
-    } 
+    }
     return result + 10 * (value >> 4);
 }
 
