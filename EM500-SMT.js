@@ -13,6 +13,12 @@ Author:
 
 */
 
+// ttn v3 decoder
+function decodeUplink(input)
+    {
+    return  { data: Decoder(input.bytes, input.fPort) };
+    }
+
 /**
  * Ursalink Sensor Payload Decoder
  *
@@ -68,41 +74,54 @@ function Decoder(bytes, port) {
             // FORMAT_VERSION
             if (channel_type === 0x01) {
                 decoded.FormatVersion = bytes[i++];
+                continue;
             }
             // HARDWARE_VERSION
             else if (channel_type === 0x09) {
                 decoded.HardwareVersion = readVersion(bytes.slice(i, i+2));
                 i += 2;
+                continue;
             }
             // SOFTWARE_VERSION
             else if (channel_type === 0x0A) {
                 decoded.SoftwareVersion = readVersion(bytes.slice(i, i+2));
                 i += 2;
+                continue;
             }
             // RESTART
             if (channel_type === 0x0B) {
                 decoded.restart = 1;
                 ++i;
+                continue;
             }
             // POWER OFF
             if (channel_type === 0x0C) {
                 decoded.shutdown = 1;
                 ++i;
+                continue;
             }
             // CLASS
             else if (channel_type === 0x0F) {
                 decoded.Class = bytes[i++];
+                continue;
             }
             // SERIAL_NUMBER
             else if (channel_type === 0x16) {
-                decoded.SerialNumber = readHexBytes(bytes.slice(i, i+6));
-                i += 6;
+                decoded.SerialNumber = readHexBytes(bytes.slice(i, i+8));
+                i += 8;
+                continue;
             } else {
                 decoded.Error = true;
+                decoded.channel_id = channel_id;
+                decoded.channel_type = channel_type;
+                decoded.byte_position = i;
+                decoded.ErrorType = "unknown channel type";
                 break;
             }
         } else {
-            decoded.error = true;
+            decoded.Error = true;
+            decoded.ErrorType = "unknown channel id";
+            decoded.channel_id = channel_id;
             break;
         }
     }
@@ -119,6 +138,11 @@ function readUInt16LE(bytes) {
 function readInt16LE(bytes) {
     var ref = readUInt16LE(bytes);
     return ref > 0x7fff ? ref - 0x10000 : ref;
+}
+
+function readUInt16BE(bytes) {
+    var value = (bytes[0] << 8) + bytes[1];
+    return value;
 }
 
 function bcd2ToDecimal(value) {
