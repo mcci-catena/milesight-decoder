@@ -186,3 +186,11 @@ function readHexBytes(bytes) {
     }
     return result.substr(1);
 }
+
+// TTN V3 decoder -- just call the TTN V2 decoder and package the results.
+function decodeUplink(tInput) {
+	var decoded = Decoder(tInput.bytes, tInput.fPort);
+	var result = {};
+	result.data = decoded;
+	return result;
+}
