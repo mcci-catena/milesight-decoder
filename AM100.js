@@ -3,7 +3,7 @@
 Name:   AM100.js
 
 Function:
-    Decode Ursalink port 85 messages for TTN console.
+    Decode Milesight port 85 messages for TTN console.
 
 Copyright and License:
     See accompanying LICENSE file at https://github.com/mcci-catena/MCCI-Catena-PMS7003/
@@ -14,7 +14,7 @@ Author:
 */
 
 /**
- * Ursalink AM100 / AM102 Payload Decoder
+ * Milesight AM100 / AM102 / EM300-TH Payload Decoder
  *
  * definition [channel-id] [channel-type] [channel-data]
  *
@@ -32,8 +32,8 @@ Author:
 function Decoder(bytes, port) {
     var decoded = {};
 
-    // accept either no port at all, or port 85
-    if (! (port === undefined || port === 85)) {
+    // accept either no port at all, or port 85, or port 84
+    if (! (port === undefined || port === 85 || port === 84)) {
         return null;
     }
 
