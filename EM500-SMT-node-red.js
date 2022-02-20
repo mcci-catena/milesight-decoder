@@ -2,11 +2,11 @@
 // Module:  EMT500-SMT-node-red.js
 //
 // Function:
-//      This Node-RED decoding function decodes the record sent by the Ursalink
-//      EMT500-SMT sensor
+//      This Node-RED decoding function decodes the record sent by the Milesight
+//      EMT500-SMT sensor.
 //
 // License:
-//      Copyright (C) 2020, MCCI Corporation.
+//      Copyright (C) 2020, 2022, MCCI Corporation.
 //      See LICENSE in accompanying git repository.
 //
 
@@ -36,7 +36,7 @@ function dewpoint(t, rh) {
 Name:   EM500-SMT.js
 
 Function:
-    Decode Ursalink soil-monitoring port 85 messages for TTN console.
+    Decode Milesight soil-monitoring port 85 messages for TTN console.
 
 Copyright and License:
     See accompanying LICENSE file at https://github.com/mcci-catena/MCCI-Catena-PMS7003/
@@ -214,49 +214,58 @@ Node-RED function body.
 Input:
     msg     the object to be decoded.
 
-            msg.payload_raw is taken
-            as the raw payload if present; otheriwse msg.payload
-            is taken to be a raw payload.
-
-            msg.port is taken to be the LoRaWAN port nubmer.
-
+            msg.payload is assumed to be a string containing
+            serialized JSON, as produced by the Things Stack.
+            It is parsed, and the frm_payload is decoded
+            to form the payload.
 
 Returns:
     This function returns a message body. It's a mutation of the
-    input msg; msg.payload is changed to the decoded data, and
-    msg.local is set to additional application-specific information.
+    input msg; msg.payload is changed to the decoded data,
+    msg.local is set to additional application-specific information,
+    msg.payload_input is set to the decoded message from TTN,
+    and msg.payload contains `temperature`, `humidity`,
+    `tDewpoint`, and `battery`, along with
+    various RF metrics.
 
 */
 
 var b;
 
-if ("payload_raw" in msg) {
-    // the console already decoded this
-    b = msg.payload_raw;  // pick up data for convenience
+var payload = JSON.parse(msg.payload)
+
+if ("frm_payload" in payload.uplink_message) {
+    b = Buffer(payload.uplink_message.frm_payload, 'base64');  // pick up data for convenience
     // msg.payload_fields still has the decoded data
 }
 else {
-    // no console debug
-    b = msg.payload;  // pick up data for conveneince
+    return { payload: { error: "No frm_payload in msg.payload" } }
 }
 
-var result = Decoder(b, msg.port);
+var result = Decoder(b, payload.f_port);
+var msg_out = {};
 
-// dewpoint might be interesting, so compute and store it.
+// include the input payload
+msg_out.payload_input = payload;
+msg_out.device_id = payload.end_device_ids.device_id;
+msg_out.dev_eui = payload.end_device_ids.dev_eui;
+msg_out.received_at = payload.received_at;
+
+// calcluate the dewpoint
 if ("temperature" in result && "humidity" in result)
     {
     result.tDewC = dewpoint(result.temperature, result.humidity);
     }
 
 // now update msg with the new payload and new .local field
-// the old msg.payload is overwritten.
-msg.payload = result;
-msg.local =
+msg_out.topic = msg.topic;
+msg_out.payload = result;
+msg_out.local =
     {
-        nodeType: "Ursalink EM500-SMT",
-        platformType: "Urasalink EM500",
-        radioType: "Ursalink",
+        nodeType: "Milesight EM500-SMT",
+        platformType: "Milesight EM500",
+        radioType: "Milesight",
         applicationName: "Soil Monitor"
     };
 
-return msg;
+return msg_out;
